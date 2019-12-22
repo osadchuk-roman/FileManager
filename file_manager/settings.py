@@ -26,7 +26,7 @@ SECRET_KEY = '*covw9i++*w*7$y3x)qc^*5ja$&jpdq$qdm_an_%ucwka!=&eb'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['romanosadchuk.pythonanywhere.com', 'https://osadchuk-file-manager.herokuapp.com/']
 
 # Application definition
 
