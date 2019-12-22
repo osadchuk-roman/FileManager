@@ -116,10 +116,10 @@
                                     <option value= {{ item }}> {{ item }} </option>
                                 {% endfor %}
                             </select>
-                            {{ message }}
                             <input type="hidden" name="path" value="{{ path }}">
                             <input class="btn btn-primary" type="submit" name="button" value="Перейти/Завантажити">
-                        <span style="font-size: 10pt">(Якщо обрано файл, то він буде скачений у каталог для завантажень)</span>
+                            <span style="font-size: 10pt">(Якщо обрано файл, то він буде скачений у каталог для завантажень)</span>
+                            <span style="font-size: 14pt; color: darkred">{{ message }}</span>
                         </div>
                         <div>
                             Поточний каталог сервера: <b>{{ path }}</b>
@@ -137,6 +137,10 @@
                                 </table>
                             </div>
                             <br>
+                        </div>
+                        <div>
+                            <input name="uploadFile" type="text" placeholder="Шлях до файлу">
+                            <button class="btn btn-primary" type="submit" name="button" value="Upload">Завантажити на сервер</button>
                         </div>
                     </div>
                 </td>

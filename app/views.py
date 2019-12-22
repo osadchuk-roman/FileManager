@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render
 from django.http import HttpResponseNotFound
 from .models import Connection
@@ -70,12 +72,30 @@ def index(request):
                 ftp.cwd(path)
                 data = ftp.nlst()
             except:
+                if path_save == '':
+                    path_save = "C:\\"
                 with open(path_save+filename, 'wb') as f:
                     ftp.retrbinary('RETR ' + path, f.write)
                 path = initial_path
                 ftp.cwd(path)
                 data = ftp.nlst()
                 message = "Файл було завантажено у "+path_save+filename
+
+        if action == "Upload":
+            upload_file_path = request.POST.get("uploadFile")
+            print(upload_file_path)
+            id = request.POST.get("select")
+            path = request.POST.get("path")
+            connection = Connection.objects.get(id=id)
+            ftp = FTP(connection.host, connection.user, connection.password)
+            message = ""
+            try:
+                ftp.cwd(path)
+                dir, file = os.path.split(upload_file_path)
+                ftp.storbinary('STOR '+file, open(upload_file_path, 'rb'))
+                data = ftp.nlst()
+            except:
+                print("Error")
 
     return render(request, "index.html", context={"connections": connections, "path": path, "host": host, "data": data,
                                                   "message": message})
