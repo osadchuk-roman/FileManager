@@ -1,9 +1,8 @@
-import os
-
 from django.shortcuts import render
 from django.http import HttpResponseNotFound
+
+from app.server_operations import ServerOperations
 from .models import Connection
-from ftplib import FTP
 
 
 def index(request):
@@ -12,6 +11,7 @@ def index(request):
     data = []
     path = '..'
     message = ""
+    server_op = ServerOperations()
     if request.method == "POST":
         action = request.POST.get("button")
         if action == "Створити":
@@ -48,8 +48,8 @@ def index(request):
             try:
                 id = request.POST.get("select")
                 connection = Connection.objects.get(id=id)
-                ftp = FTP(connection.host, connection.user, connection.password)
-                data = ftp.nlst()
+                server_op.connect(connection)
+                data = server_op.get_files()
             except:
                 return HttpResponseNotFound("<h2>З'эднання не знайдено</h2>")
 
@@ -66,20 +66,19 @@ def index(request):
             else:
                 path += '/' + filename
             connection = Connection.objects.get(id=id)
-            ftp = FTP(connection.host, connection.user, connection.password)
+            server_op.connect(connection)
             message = ""
             try:
-                ftp.cwd(path)
-                data = ftp.nlst()
+                server_op.load_directory(path)
+                data = server_op.get_files()
             except:
                 if path_save == '':
                     path_save = "C:\\"
-                with open(path_save+filename, 'wb') as f:
-                    ftp.retrbinary('RETR ' + path, f.write)
+                server_op.download_file(path, path_save, filename)
                 path = initial_path
-                ftp.cwd(path)
-                data = ftp.nlst()
-                message = "Файл було завантажено у "+path_save+filename
+                server_op.load_directory(path)
+                data = server_op.get_files()
+                message = "Файл було завантажено у " + path_save + filename
 
         if action == "Upload":
             upload_file_path = request.POST.get("uploadFile")
@@ -87,13 +86,12 @@ def index(request):
             id = request.POST.get("select")
             path = request.POST.get("path")
             connection = Connection.objects.get(id=id)
-            ftp = FTP(connection.host, connection.user, connection.password)
+            server_op.connect(connection)
             message = ""
             try:
-                ftp.cwd(path)
-                dir, file = os.path.split(upload_file_path)
-                ftp.storbinary('STOR '+file, open(upload_file_path, 'rb'))
-                data = ftp.nlst()
+                server_op.load_directory(path)
+                server_op.upload_file(upload_file_path)
+                data = server_op.get_files()
             except:
                 print("Error")
 
